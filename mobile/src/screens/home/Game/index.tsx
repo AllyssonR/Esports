@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Entypo } from "@expo/vector-icons";
@@ -6,10 +6,19 @@ import logoImg from "../../../assets/logo-nlw-esports.png";
 import { Background } from "../../../components/Background";
 import { styles } from "./styles";
 import { GameParams } from "../../../@types/navigation";
-import { Image, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, TouchableOpacity, View } from "react-native";
 import { THEME } from "../../../theme";
 import { Heading } from "../../../components/Heading";
 import { DuoCard } from "../../../components/DuoCard";
+export interface DuoCardProps {
+  id: string;
+  hourEnd: string;
+  hourStart: string;
+  name: string;
+  useVoiceChannel: boolean;
+  weekDays: string[];
+  yearsPlaying: number;
+}
 
 export function Game() {
   const navigation = useNavigation();
@@ -18,11 +27,11 @@ export function Game() {
   function handleGoBack() {
     navigation.goBack();
   }
-  const[ads,setAds]=useState()
+  const [duos, setDuos] = useState<DuoCardProps[]>([]);
   useEffect(() => {
-    fetch(`http://192.168.0.11:3333/games/:${game.id}/ads`)
+    fetch(`http://10.0.0.110:3333/games/:${game.id}/ads`)
       .then((response) => response.json())
-      .then((data) => setAds(data));
+      .then((data) => setDuos(data));
   }, []);
   return (
     <Background>
@@ -45,7 +54,11 @@ export function Game() {
         />
 
         <Heading title={game.title} subtitle="Conecte-se e comece a jogar!" />
-        <DuoCard />
+        <FlatList
+          data={duos}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <DuoCard data={duos[0]} />}
+        />
       </SafeAreaView>
     </Background>
   );
